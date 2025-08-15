@@ -43,7 +43,7 @@
                                 carto_dark: {
                                     type: 'raster',
                                     tiles: [
-                                        'https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png'
+                                        'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
                                     ],
                                     tileSize: 256,
                                     attribution: '© CARTO © OpenStreetMap contributors'
