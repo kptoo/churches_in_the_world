@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@mapbox/mbtiles": "^0.12.1",
+    "@mapbox/vector-tile": "^2.0.3",
+    "pbf": "^4.0.1"
+  }
+}

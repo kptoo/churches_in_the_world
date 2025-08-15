@@ -1,0 +1,1265 @@
+/* Base Styles */
+html, body, #map {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.close-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    padding: 5px;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.close-button:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+@media (min-width: 768px) {
+    .close-button {
+        display: none;
+    }
+}
+
+/* Panel styling with blue color scheme */
+.panel {
+    position: absolute;
+    z-index: 1000;
+    background: #f0f8ff; /* Light blue background */
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    border: 1px solid #bbd6ff;
+    max-width: 90%; /* Prevent overflow on mobile */
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 5px;
+    background-color: #cce0ff; /* Slightly darker blue for header */
+    border-radius: 3px;
+    margin-bottom: 8px;
+}
+
+.panel-header h4 {
+    margin: 0;
+    color: #003366; /* Dark blue text */
+    font-size: 1rem; /* Better sizing for mobile */
+}
+
+.panel-content {
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.panel-content.collapsed {
+    max-height: 0;
+    display: none; /* Hide completely when collapsed for better space usage */
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 5px;
+    color: #003366; /* Dark blue */
+    min-width: 20px; /* Ensure touchable size */
+    min-height: 20px;
+}
+
+#filter-panel {
+    top: 10px;
+    right: 10px;
+    max-height: 80vh;
+    overflow-y: auto;
+    width: 250px;
+}
+
+#legend {
+    bottom: 30px;
+    right: 10px;
+}
+
+
+#church-list-panel {
+    top: 10px;
+    right: 290px;
+    width: 270px;
+    max-height: 527px;
+    overflow-y: auto;
+}
+
+/* Enhanced mobile-specific adjustments */
+@media (min-width: 768px) {
+    #church-list-panel {
+        display: none;
+    }
+
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 767px) {
+    .panel {
+        max-height: 60vh; /* Reduced height on mobile */
+        max-width: 85%;
+        box-shadow: 0 0 15px rgba(0,0,0,0.3); /* Stronger shadow for better visibility */
+    }
+    #filter-panel {
+        width: 85%;
+        max-width: 280px;
+        right: 5px;
+        top: 50%; /* Center vertically */
+        display: none; /* Initially hidden on mobile */
+        left: 50%; /* Center horizontally */
+        transform: translate(-50%, -50%); /* Adjust for centering */
+    }
+
+    #church-list-panel {
+        width: 85%;
+        max-width: 280px;
+        right: 5px;
+        top: 50%; /* Center vertically */
+        display: none; /* Initially hidden on mobile */
+        left: 50%; /* Center horizontally */
+        transform: translate(-50%, -50%); /* Adjust for centering */
+    }
+
+    #legend {
+        bottom: 10px;
+        right: 5px;
+        max-width: 160px;
+        z-index: 999; /* Ensure it's above other elements */
+    }
+
+    .panel-content {
+        display: block; /* Initially collapsed on mobile */
+        font-size: 14px; /* Make text smaller on mobile */
+        text-align: center; /* Center content */
+    }
+
+    .panel-header {
+        padding: 8px; /* Larger touch target */
+    }
+
+    /* Mobile toggle button for church list panel */
+    #mobile-toggle-list {
+        position: absolute;
+        top: 50px; /* Positioned lower to avoid overlapping with filter panel */
+        right: 10px;
+        z-index: 1000;
+        background: #003366;
+        color: white;
+        padding: 8px 12px; /* Larger padding for better touch target */
+        border-radius: 4px;
+        display: block;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    /* Mobile-specific panel transitions */
+    .panel {
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        max-height: 60vh; /* Reduced height on mobile */
+        max-width: 85%;
+        box-shadow: 0 0 15px rgba(0,0,0,0.3); /* Stronger shadow for better visibility */
+    }
+
+    .panel.minimized {
+        transform: scale(0.95);
+        opacity: 0.9;
+    }
+
+    /* Better visibility for toggle buttons */
+    .toggle-btn {
+        font-size: 18px;
+        min-width: 25px;
+        min-height: 25px;
+        color: #002244; /* Darker color for better contrast */
+    }
+
+    /* Small buttons for filter and church list */
+    .top-left-buttons {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 1100;
+    }
+
+    .top-left-buttons button {
+        width: 50px;
+        height: 50px;
+        border-radius: 25px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .top-left-buttons button:hover {
+        background-color: #0056b3;
+    }
+
+    .top-left-buttons button:active {
+        transform: scale(0.95);
+    }
+
+}
+
+#church-list {
+    max-height: calc(80vh - 50px);
+    overflow-y: auto;
+}
+
+/* Search input styling */
+.search-container {
+    position: relative;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.search-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #80b3ff; /* Blue border */
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 5px;
+    background-color: #fcfdff;
+    font-size: 16px; /* Better for mobile input */
+}
+
+.filter-section {
+    margin-bottom: 15px;
+}
+
+
+/* Church list item */
+.church-item {
+    padding: 12px; /* Larger padding for better touch targets */
+    border-bottom: 1px solid #cce0ff; /* Light blue border */
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.church-item:hover, .church-item:active {
+    background-color: #e6f0ff; /* Light blue hover */
+}
+
+.church-title {
+    font-weight: bold;
+    margin-bottom: 3px;
+    color: #003366; /* Dark blue */
+    font-size: 14px; /* Slightly larger for mobile */
+}
+
+.church-details {
+    font-size: 12px;
+    color: #4682B4; /* Steel blue */
+}
+
+/* Enhanced cluster styling */
+.marker-cluster {
+    background-clip: padding-box;
+    border-radius: 20px;
+}
+
+.marker-cluster div {
+    width: 36px;
+    height: 36px;
+    margin-left: 2px;
+    margin-top: 2px;
+    text-align: center;
+    border-radius: 18px;
+    font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.marker-cluster span {
+    color: white;
+    font-weight: bold;
+}
+
+/* Enhanced cluster colors with better visibility */
+.cluster-small div {
+    background-color: rgba(115, 170, 255, 0.9); /* Brighter blue */
+}
+
+.cluster-medium div {
+    background-color: rgba(64, 127, 219, 0.9); /* Medium Blue */
+}
+
+.cluster-large div {
+    background-color: rgba(28, 82, 168, 0.9); /* Dark Blue */
+}
+
+.marker-cluster-small {
+    background-color: rgba(115, 170, 255, 0.5); /* Brighter blue */
+}
+
+.marker-cluster-medium {
+    background-color: rgba(64, 127, 219, 0.5); /* Medium Blue */
+}
+
+.marker-cluster-large {
+    background-color: rgba(28, 82, 168, 0.5); /* Dark Blue */
+}
+
+/* Enhanced legend */
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.legend-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.legend-text {
+    flex: 1;
+    color: #003366; /* Dark blue */
+}
+
+/* Updated color filters for church and cathedral icons */
+.cathedral-icon-green {
+    filter: hue-rotate(90deg) saturate(1.3) brightness(1.2); /* This will make it green */
+}
+
+.church-icon-white {
+    filter: brightness(2) saturate(0); /* This will make it white */
+}
+
+/* Updated legend icons with the new designs */
+#basilica-icon {
+    background-color: #00FF00; /* Green */
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); /* Star shape */
+}
+
+#church-icon {
+    background-color: #FFFFFF; /* White */
+    border-radius: 50%;
+}
+
+#cross-icon {
+    position: relative;
+    background-color: transparent;
+}
+
+#cross-icon:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 40%;
+    width: 20%;
+    height: 100%;
+    background-color: #FFFFFF; /* White */
+}
+
+#cross-icon:after {
+    content: '';
+    position: absolute;
+    top: 40%;
+    left: 0;
+    width: 100%;
+    height: 20%;
+    background-color: #FFFFFF; /* White */
+}
+
+/* Dropdown suggestion */
+.dropdown-list {
+    position: absolute;
+    width: 100%;
+    max-height: 150px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #80b3ff; /* Blue border */
+    border-radius: 0 0 4px 4px;
+    z-index: 1001;
+    display: none;
+}
+
+.dropdown-item {
+    padding: 12px; /* Larger touch target for mobile */
+    cursor: pointer;
+    font-size: 14px; /* Slightly larger text for mobile */
+}
+
+.dropdown-item:hover, .dropdown-item:active {
+    background-color: #e6f0ff; /* Light blue hover */
+}
+
+/* Filter status indicator */
+#filter-active-indicator {
+    display: none;
+    position: absolute;
+    top: 10px;
+    left: 60px;
+    background: rgba(0, 51, 102, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 1000;
+}
+
+/* Added zoom-to-filter button */
+#zoom-to-filter {
+    margin-top: 10px;
+    width: 100%;
+    padding: 10px; /* Larger for touch */
+    background: #003366;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px; /* Better for mobile */
+}
+
+#zoom-to-filter:hover, #zoom-to-filter:active {
+    background: #002244;
+}
+
+/* Mobile-specific buttons */
+.mobile-btn {
+    padding: 10px 12px; /* Slightly larger horizontal padding */
+    background: #003366;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 5px;
+    display: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Add shadow for better visibility */
+}
+
+@media (max-width: 767px) {
+    .mobile-btn {
+        display: block;
+    }
+    
+    .leaflet-control-locate {
+        margin-top: 50px !important; /* More space for controls */
+    }
+    
+    /* Make sure buttons have enough space between them for touch */
+    #reset-filters, #zoom-to-filter, .mobile-btn {
+        margin-bottom: 10px;
+        padding: 12px 10px; /* Taller for better touch targets */
+    }
+    
+    /* Enhanced touch targets for leaflet controls */
+    .leaflet-touch .leaflet-control-layers, 
+    .leaflet-touch .leaflet-bar a {
+        min-width: 35px; /* Increased from 30px */
+        min-height: 35px; /* Increased from 30px */
+        line-height: 35px; /* Match the min-height */
+    }
+    
+    /* Improved visibility for map controls */
+    .leaflet-control-zoom a {
+        font-size: 18px !important; /* Larger icons */
+        font-weight: bold;
+    }
+    
+    /* Make filter inputs larger on mobile */
+    .search-input {
+        height: 40px; /* Taller input fields */
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+    
+    /* Fix for iOS preventing zooming on inputs */
+    input[type="text"] {
+        font-size: 16px !important;
+    }
+}
+
+/* Legend image styling */
+.legend-image {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+    object-fit: contain;
+}
+  
+/* Updated legend item alignment */
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+  
+.legend-text {
+    flex: 1;
+    color: #003366; /* Dark blue */
+}
+  
+/* Mobile-optimized legend */
+@media (max-width: 767px) {
+    #legend {
+        display: none;
+    }
+    .legend-item {
+        margin-bottom: 15px; /* More space between items */
+    }
+      
+    .legend-image {
+        width: 28px; /* Larger icons */
+        height: 28px;
+    }
+      
+    .legend-text {
+        font-size: 14px; /* Slightly larger text */
+    }
+}
+  
+/* Enhanced Quick access floating action button for mobile */
+#mobile-quick-actions {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: #003366;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    z-index: 1000;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+#mobile-quick-actions:active {
+    transform: scale(0.95);
+    background-color: #002244;
+}
+
+#mobile-actions-menu {
+    position: fixed;
+    bottom: 80px;
+    left: 20px;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    width: 180px;
+    transform: translateY(10px);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+#mobile-actions-menu.visible {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.mobile-action-item {
+    padding: 12px;
+    text-align: left;
+    border: none;
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    font-size: 14px;
+    color: #003366;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.mobile-action-item:last-child {
+    border-bottom: none;
+}
+
+.mobile-action-item:hover, .mobile-action-item:active {
+    background: #f0f8ff;
+}
+
+.mobile-action-item.active {
+    background-color: #e6f0ff;
+    font-weight: bold;
+}
+
+.mobile-action-icon {
+    margin-right: 10px;
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.panel-visibility-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #4CAF50;
+    margin-left: auto;
+    display: none;
+}
+
+.mobile-action-item.panel-visible .panel-visibility-indicator {
+    display: block;
+}
+
+@media (max-width: 767px) {
+    #mobile-quick-actions {
+        display: flex;
+    }
+}
+
+/* Panel control badges for quick actions menu */
+.panel-control-badge {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+.panel-control-badge.panel-active {
+    background-color: #4CAF50; /* Green for active */
+}
+
+.panel-control-badge.panel-inactive {
+    background-color: #ccc; /* Gray for inactive */
+}
+
+/* Mobile popup styling to ensure visibility */
+.mobile-popup .leaflet-popup-content-wrapper {
+    max-width: 280px;
+    font-size: 14px;
+}
+
+.mobile-popup .leaflet-popup-content {
+    margin: 10px 12px;
+    line-height: 1.5;
+}
+
+.mobile-popup .leaflet-popup-close-button {
+    padding: 6px 6px 0 0; /* Larger touch target */
+    font-size: 18px; /* Larger X button */
+}
+
+/* Ensure popup is visible and not cut off on mobile */
+.leaflet-popup {
+    margin-bottom: 0; /* Adjust position to ensure visibility */
+}
+
+/* Fix for popup being cut off at the bottom on mobile */
+.leaflet-popup-tip-container {
+    margin-top: -1px;
+}
+
+/* Fix for popup not appearing */
+.leaflet-popup-content-wrapper {
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+/* Make popups more visible with brighter background */
+.leaflet-popup-content-wrapper {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    border: 2px solid rgba(0, 51, 102, 0.5) !important;
+}
+
+/* Make sure popup tips are visible */
+.leaflet-popup-tip {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Reset filters button styling */
+#reset-filters {
+    width: 100%;
+    padding: 12px;
+    background: #4682B4;
+    color: white;
+    border: 1px solid #3366cc;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+#reset-filters:hover, #reset-filters:active {
+    background: #3671A3;
+}
+
+@media (max-width: 767px) {
+    #mobile-toggle-list {
+        display: none; /* Hide the button on mobile */
+    }
+}
+
+/* Mobile Panel Controls */
+.mobile-panel-controls {
+    display: none;
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1001;
+    display: flex;
+    gap: 8px;
+}
+
+.mobile-panel-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #003366;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.mobile-panel-button i {
+    font-size: 16px;
+    margin: 0;
+}
+
+.mobile-panel-button:hover,
+.mobile-panel-button:active {
+    background: #002244;
+    transform: scale(0.95);
+}
+
+.mobile-panel-button.active {
+    background: #4682B4;
+}
+
+@media (max-width: 767px) {
+    .mobile-panel-controls {
+        display: flex;
+    }
+
+    /* Hide toggle buttons on mobile */
+    .panel-header .toggle-btn {
+        display: none;
+    }
+
+    /* Adjust spacing for content */
+    #church-list-content,
+    #filter-content {
+        padding: 10px;
+        overflow-y: auto;
+    }
+
+    /* Ensure church list scrolls properly */
+    #church-list {
+        max-height: calc(80vh - 60px);
+        overflow-y: auto;
+    }
+
+    /* Remove collapse/expand functionality on mobile */
+    .panel-header {
+        cursor: default;
+        pointer-events: none;
+    }
+
+    /* Adjust map controls to not overlap with the circular buttons */
+    .leaflet-top.leaflet-right {
+        margin-top: 60px;
+    }
+
+    /* Hide the old mobile toggle button */
+    #mobile-toggle-list {
+        display: none;
+    }
+}
+
+
+   .peeking-button-container {
+    position: fixed; /* Stick to viewport */
+    top: 65%;
+    left: -10px;
+    transform: translateY(-50%) rotate(270deg);
+    transform-origin: top left;
+    z-index: 999;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: auto; /* Only as wide as needed */
+    pointer-events: auto;
+}
+
+.peeking-button {
+    background: #e6f0ff;
+    color: #003366;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px 25px;
+    border: 2px solid #cce0ff;
+    border-radius: 0 0 25px 25px;
+    box-shadow: 0 5px 15px rgba(0, 51, 102, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    letter-spacing: 1px;
+    text-align: center;
+    max-width: 90vw;
+    white-space: nowrap;
+}
+
+.peeking-button:hover {
+    background: #4d7dc6;
+    box-shadow: 0 8px 20px rgba(0, 51, 102, 0.2);
+    transform: translateY(3px); /* only affects hover state */
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+    .peeking-button {
+        font-size: 13px;
+        padding: 8px 20px;
+        max-width: 95vw;
+    }
+}
+
+/* Phone */
+@media (max-width: 480px) {
+    .peeking-button {
+        font-size: 12px;
+        padding: 6px 16px;
+        max-width: 95vw;
+    }
+}
+
+
+    /*---------------------------------------------------------------------------------*/
+    #pope-icon {
+    background-color: #FFFFFF; /* White */
+    border-radius: 50%;
+    }
+
+    #saint-icon {
+        background-color: #FFFFFF; /* White */
+        border-radius: 50%;
+    }
+
+    #miracle-icon {
+        background-color: #FFFFFF; /* White */
+        border-radius: 50%;
+    }
+
+    .legend-circle {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 6px;
+        border: 1px solid #444;
+    }
+
+    /*------------------------------------------------------------------------------------*/
+    /* Hamburger styles */
+    .hamburger {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 30px;
+        height: 25px;
+        cursor: pointer;
+        z-index: 10001;
+    }
+
+    .hamburger div {
+        width: 100%;
+        height: 4px;
+        background: hsl(100, 100%, 100%); /* Dark blue to match .church-title */
+        margin: 5px 0;
+    }
+
+/*--------------------------------------------------------------------------------------------*/
+    /* Panel styling */
+    .panel-v2 {
+        position: fixed;
+        top: 20px;
+        right: 60px; /* Next to hamburger */
+        width: 250px;
+        background: #ffffff; /* White background */
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        padding: 10px;
+        display: none;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 10000;
+    }
+
+    .panel-v2.show {
+        display: flex;
+    }
+
+    /* Menu list styles */
+    .menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .menu li {
+        padding: 12px;
+        border-bottom: 1px solid #cce0ff; /* Light blue border */
+        cursor: pointer;
+        background-color: transparent;
+        transition: background-color 0.2s;
+        font-size: 14px;
+        font-weight: bold;
+        color: #003366; /* Dark blue text */
+    }
+
+    .menu li:hover,
+    .menu li:active {
+        background-color: #e6f0ff; /* Light blue hover */
+    }
+
+    /* Search box */
+    #searchBox {
+        padding: 6px;
+        width: 100%;
+        box-sizing: border-box;
+        font-size: 12px;
+        border: 1px solid #cce0ff;
+        color: #003366;
+    }
+
+    /* Data list */
+    #dataList {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    #dataList li {
+        padding: 12px;
+        border-bottom: 1px solid #cce0ff;
+        cursor: pointer;
+        font-size: 12px;
+        color: #4682B4; /* Steel blue to match .church-details */
+        transition: background-color 0.2s;
+    }
+
+    #dataList li:hover {
+        background-color: #e6f0ff;
+        color: #003366; /* Dark blue on hover for better visibility */
+    }
+
+    /*---------------------------------------------------------------------
+    /* Always-visible Legend V2 */
+#legend-v2 {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: #f0f8ff;
+    border: 1px solid #bbd6ff;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    max-width: 250px;
+    z-index: 999;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Legend header (no toggle button) */
+#legend-header-v2 h4 {
+    margin: 0 0 10px 0;
+    color: #003366;
+    font-size: 1rem;
+}
+
+/* Each legend item */
+.legend-item-v2 {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+/* Colored circle */
+.legend-circle-v2 {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+/* Image/icon */
+.legend-image-v2 {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    margin-right: 8px;
+}
+
+/* Label */
+.legend-text-v2 {
+    color: #003366;
+    font-size: 14px;
+    flex: 1;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+    #legend-v2 {
+        max-width: 95%;
+        padding: 6px;
+    }
+
+    .legend-circle {
+        width: 10px;
+        height: 10px;
+        margin-right: 4px;
+    }
+
+    .legend-image {
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+    }
+
+    .legend-text {
+        font-size: 11px;
+    }
+
+    #pane-header h4 {
+        font-size: 14px;
+        margin: 4px 0;
+    }
+
+    .legend-item {
+        margin-bottom: 6px;
+    }
+      
+    #dataList {
+        max-height: 320px;
+    }
+}
+
+
+/*---------------------------------------------------------------------------------------------*/
+#paginationContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+#paginationContainer button {
+    padding: 8px 16px;
+    background-color: #e6f0ff; /* Light blue */
+    border: 1px solid #cce0ff; /* Light border */
+    color: #003366; /* Dark blue text */
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+#paginationContainer button:hover,
+#paginationContainer button:focus {
+    background-color: #cce0ff; /* Slightly darker blue on hover */
+    box-shadow: 0 0 5px rgba(0, 51, 102, 0.2);
+}
+
+#paginationContainer #pageInfo {
+    font-size: 14px;
+    color: #003366;
+    font-weight: bold;
+}
+
+
+/*----------------------------------------------------------------------------------*/
+/* Container card */
+.pope-card {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    max-width: 250px;
+     /* height: 370px; fixed height */
+     /*overflow-y: auto;  scroll if content is too tall */
+    background: #e6f0ff;
+    border: 1px solid #cce0ff;
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 3px 8px rgba(0, 51, 102, 0.1);
+    color: #003366;
+}
+
+
+/* Header section */
+.pope-card-header {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #003366; /* Dark blue */
+    text-align: center; 
+}
+
+/* Label-value pairs */
+.pope-card div strong {
+    color: #003366; /* Ensure all labels are in strong dark blue */
+}
+
+/*-----------------------------------------------------------------------------------------*/
+/* Main container */
+#church-list-pagination.pagination-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Flex layout for each section */
+#church-list-pagination .pagination-left,
+#church-list-pagination .pagination-center,
+#church-list-pagination .pagination-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+#church-list-pagination .pagination-left {
+    justify-content: flex-start;
+}
+
+#church-list-pagination .pagination-center {
+    justify-content: center;
+}
+
+#church-list-pagination .pagination-right {
+    justify-content: flex-end;
+}
+
+/* Buttons */
+#church-list-pagination button {
+    padding: 8px 16px;
+    background-color: #e6f0ff;
+    border: 1px solid #cce0ff;
+    color: #003366;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+#church-list-pagination button:hover {
+    background-color: #cce0ff;
+    box-shadow: 0 0 5px rgba(0, 51, 102, 0.2);
+}
+
+/* Info text */
+#church-list-pagination #pageInfo {
+    font-size: 14px;
+    color: #003366;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+}
+
+
+/*----------------------------------------------------------------------*/
+/* Additional styles specific to MapLibre integration if needed 
+.maplibregl-popup-content {
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 10px;
+    max-width: 250px;
+    width:250px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.maplibregl-popup-close-button {
+    font-size: 18px;
+    padding: 5px;
+}*/
+
+.mapboxgl-ctrl-geolocate { /* Style MapLibre geolocate like reference */
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 4px !important;
+}
+.mapboxgl-ctrl-geolocate .mapboxgl-ctrl-icon {
+     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23333'%3E%3Cpath d='M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z'/%3E%3C/svg%3E") !important;
+}
+
+/*-----------------------------------------------------------------*/
+
+.carousel-button {
+    background-color: #f0f0f0;
+    border: none;
+    padding: 6px 12px;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.carousel-button:hover {
+    background-color: #ddd;
+}
+
+
+.carousel-button.left {
+    left: 0;
+}
+.carousel-button.right {
+    right: 0;
+}
+
+.pope-card {
+    padding: 10px;
+    font-size: 14px;
+}
+.pope-card-header {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 5px;
+}

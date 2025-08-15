@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no,width=device-width">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <title>Parish Map</title>
+
+    <!-- MapLibre GL JS -->
+    <link href="https://unpkg.com/maplibre-gl@3.3.1/dist/maplibre-gl.css" rel="stylesheet">
+    <script src="https://unpkg.com/maplibre-gl@3.3.1/dist/maplibre-gl.js"></script>
+
+    <!-- Font Awesome for Icons (like locate) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/app.css">
+
+    <!-- Data Loader Scripts moved to end of body -->
+</head>
+<body>
+    <!-- Filter Active Indicator -->
+    <div id="filter-active-indicator">Filters Active</div>
+    
+    <!-- Filter Panel -->
+    <div id="filter-panel" class="panel">
+        <div class="panel-header" onclick="togglePanel('filter-content')">
+            <h4>Advanced Filter</h4>
+            <button class="toggle-btn" id="filter-toggle">+</button>
+        </div>
+        <div id="filter-content" class="panel-content collapsed">
+            <span class="close-button" onclick="togglePanelVisibility('filter-panel')">&times;</span>
+            <!-- Church Title Search -->
+            <div class="filter-section">
+                <label for="title-search">Church Name:</label>
+                <div class="search-container">
+                    <input type="text" id="title-search" class="search-input" placeholder="Search by church name...">
+                    <div id="title-suggestions" class="dropdown-list"></div>
+                </div>
+            </div>
+
+            <!-- City Search -->
+            <div class="filter-section">
+                <label for="city-search">City:</label>
+                <div class="search-container">
+                    <input type="text" id="city-search" class="search-input" placeholder="Search city...">
+                    <div id="city-suggestions" class="dropdown-list"></div>
+                </div>
+            </div>
+
+            <!-- Country Search -->
+            <div class="filter-section">
+                <label for="country-search">Country:</label>
+                <div class="search-container">
+                    <input type="text" id="country-search" class="search-input" placeholder="Search country...">
+                    <div id="country-suggestions" class="dropdown-list"></div>
+                </div>
+            </div>
+
+            <!-- Jurisdiction Search -->
+            <div class="filter-section">
+                <label for="jurisdiction-search">Jurisdiction:</label>
+                <div class="search-container">
+                    <input type="text" id="jurisdiction-search" class="search-input" placeholder="Search jurisdiction...">
+                    <div id="jurisdiction-suggestions" class="dropdown-list"></div>
+                </div>
+            </div>
+
+            <!-- Type Search -->
+            <div class="filter-section">
+                <label for="type-search">Type:</label>
+                <div class="search-container">
+                    <input type="text" id="type-search" class="search-input" placeholder="Search type...">
+                    <div id="type-suggestions" class="dropdown-list"></div>
+                </div>
+            </div>
+
+            <!-- Rite Search -->
+            <div class="filter-section">
+                <label for="rite-search">Rite:</label>
+                <div class="search-container">
+                    <input type="text" id="rite-search" class="search-input" placeholder="Search rite...">
+                    <div id="rite-suggestions" class="dropdown-list"></div>
+                </div>
+            </div>
+            <button id="reset-filters">Reset Filters</button>
+
+            <!--button id="zoom-to-filter">Zoom to Filtered Results</button>-->
+
+    
+        </div>
+    </div> 
+
+    <!-- Church List Panel -->
+    <div id="church-list-panel" class="panel">
+        <div class="panel-header" onclick="togglePanel('church-list-content')">
+            <h4>Churches List</h4>
+            <button class="toggle-btn" id="church-list-toggle">+</button>
+        </div>
+
+        <div id="church-list-content" class="panel-content collapsed">
+            <span class="close-button" onclick="togglePanelVisibility('church-list-panel')">&times;</span>
+            <div class="search-container">
+                <input type="text" id="list-search" class="search-input" placeholder="Filter list...">
+            </div>
+            <div id="church-list">
+                <!-- Church items will be dynamically added here -->
+               
+            </div>
+       
+        </div>
+    </div>
+
+    <!-- Legend -->
+    <div id="legend" class="panel">
+        <div class="panel-header" onclick="togglePanel('legend-content')">
+            <h4>Legend</h4>
+            <button class="toggle-btn" id="legend-toggle">+</button>
+        </div>
+
+        <div id="legend-content" class="panel-content collapsed">
+            <span class="close-button" onclick="togglePanelVisibility('legend')">&times;</span>
+            <div class="legend-item">
+                <img src="cathedral-icon.png" class="legend-image " alt="Basilica or Cathedral" />
+                <div class="legend-text">Basilica or Cathedral</div>
+            </div>
+
+            <div class="legend-item">
+                <img src="church-icon.png" class="legend-image " alt="Church" />
+                <div class="legend-text">Church or Shrine</div>
+            </div>
+
+            <div class="legend-item">
+                <img src="monument-icon.png" class="legend-image" alt="Monument" />
+                <div class="legend-text">Historic Church or Monument</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Quick Actions -->
+    <button id="mobile-quick-actions">+</button>
+    <div id="mobile-actions-menu">
+        <button class="mobile-action-item" id="action-toggle-filter" data-panel="filter-panel" data-content="filter-content">
+            <span class="mobile-action-icon">🗑️</span>
+            <span>Filters</span>
+            <span class="panel-visibility-indicator"></span>
+        </button>
+        <button class="mobile-action-item" id="action-toggle-list" data-panel="church-list-panel" data-content="church-list-content">
+            <span class="mobile-action-icon">📋</span>
+            <span>Churches</span>
+            <span class="panel-visibility-indicator"></span>
+        </button>
+        <button class="mobile-action-item" id="action-toggle-legend" data-panel="legend" data-content="legend-content">
+            <span class="mobile-action-icon">🔎</span>
+            <span>Legend</span>
+            <span class="panel-visibility-indicator"></span>
+        </button>
+        <button class="mobile-action-item" id="action-my-location">
+            <span class="mobile-action-icon">📍</span>
+            <span>My Location</span>
+        </button>
+        <button class="mobile-action-item" id="action-hide-all-panels">
+            <span class="mobile-action-icon">❌</span>
+            <span>Hide All Panels</span>
+        </button>
+    </div>
+
+
+    <div id="map"></div>
+
+     <!-- Top-Center Button -->
+   <!--<div class="peeking-button-container">
+      <a href="https://churches.onrender.com/pages/popes.html" class="peeking-button">Explore Popes, Saints and Miracles</a>
+    </div>-->
+    
+    <!-- Load required JavaScript files -->
+    <script src="js/churches.js"></script>
+    <script src="js/churches-map.js"></script>
+
+</body>
+</html>
