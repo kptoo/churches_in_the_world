@@ -35,40 +35,53 @@
                         style: {
                             version: 8,
                             sources: {
-                                // CartoDB Dark - Full zoom coverage (0-20), no rate limits
-                                carto_dark: {
+                                // OpenStreetMap - Always reliable, good coverage
+                                osm_standard: {
                                     type: 'raster',
                                     tiles: [
-                                        'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-                                    ],
-                                    tileSize: 256,
-                                    attribution: '© CARTO © OpenStreetMap contributors',
-                                    subdomains: ['a', 'b', 'c', 'd'],
-                                    minzoom: 0,
-                                    maxzoom: 20
-                                },
-                                // Stadia Dark (backup option)
-                                stadia_dark: {
-                                    type: 'raster',
-                                    tiles: [
-                                        'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
-                                    ],
-                                    tileSize: 256,
-                                    attribution: '© Stadia Maps © OpenMapTiles © OpenStreetMap contributors',
-                                    minzoom: 0,
-                                    maxzoom: 20
-                                },
-                                // OpenStreetMap (always reliable)
-                                osm: {
-                                    type: 'raster',
-                                    tiles: [
-                                        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
                                     ],
                                     tileSize: 256,
                                     attribution: '© OpenStreetMap contributors',
-                                    subdomains: ['a', 'b', 'c'],
                                     minzoom: 0,
                                     maxzoom: 19
+                                },
+                                // CartoDB Positron (light, clean)
+                                carto_positron: {
+                                    type: 'raster',
+                                    tiles: [
+                                        'https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
+                                        'https://cartodb-basemaps-b.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
+                                        'https://cartodb-basemaps-c.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png'
+                                    ],
+                                    tileSize: 256,
+                                    attribution: '© CARTO © OpenStreetMap contributors',
+                                    minzoom: 0,
+                                    maxzoom: 18
+                                },
+                                // CartoDB Dark Matter (dark theme)
+                                carto_dark: {
+                                    type: 'raster',
+                                    tiles: [
+                                        'https://cartodb-basemaps-a.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',
+                                        'https://cartodb-basemaps-b.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',
+                                        'https://cartodb-basemaps-c.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png'
+                                    ],
+                                    tileSize: 256,
+                                    attribution: '© CARTO © OpenStreetMap contributors',
+                                    minzoom: 0,
+                                    maxzoom: 18
+                                },
+                                // Wikimedia - Very reliable alternative
+                                wikimedia: {
+                                    type: 'raster',
+                                    tiles: [
+                                        'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png'
+                                    ],
+                                    tileSize: 256,
+                                    attribution: '© OpenStreetMap contributors, Wikimedia maps',
+                                    minzoom: 0,
+                                    maxzoom: 18
                                 },
                                 parishes: {
                                     type: 'vector',
@@ -82,7 +95,7 @@
                                 }
                             },
                             layers: [
-                                // Start with CartoDB dark (most reliable)
+                                // Start with CartoDB dark (will be blue-tinted by CSS)
                                 { id: 'base-tiles', type: 'raster', source: 'carto_dark' }
                             ],
                             glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf"
@@ -135,7 +148,7 @@
                     
                     const button = document.createElement('button');
                     button.innerHTML = '🌙';
-                    button.title = 'Switch Dark Style';
+                    button.title = 'Switch Map Style';
                     button.style.cssText = 'font-size: 16px; width: 30px; height: 30px; border: none; background: white; cursor: pointer;';
                     
                     button.addEventListener('click', () => {
@@ -145,12 +158,15 @@
                         let newSource;
                         switch(currentSource) {
                             case 'carto_dark':
-                                newSource = 'stadia_dark';
+                                newSource = 'carto_positron';
                                 break;
-                            case 'stadia_dark':
-                                newSource = 'osm';
+                            case 'carto_positron':
+                                newSource = 'wikimedia';
                                 break;
-                            case 'osm':
+                            case 'wikimedia':
+                                newSource = 'osm_standard';
+                                break;
+                            case 'osm_standard':
                                 newSource = 'carto_dark';
                                 break;
                             default:
