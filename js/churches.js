@@ -24,7 +24,7 @@ const ChurchesManager = (function() {
         }
 
         try {
-            const response = await fetch(`https://churches.onrender.com/churches?page=${page}&limit=500&search=${encodeURIComponent(search)}`);
+            const response = await fetch(`https://churches-in-the-world.onrender.com/churches?page=${page}&limit=500&search=${encodeURIComponent(search)}`);
             const data = await response.json();
             currentPage = data.pagination.currentPage;
             populateChurchList(data.churches, data.pagination);
