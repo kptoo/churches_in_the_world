@@ -2,6 +2,9 @@
  * churches.js - Handles church list functionality with server-side pagination and search
  */
 
+// API Configuration
+const API_BASE_URL = 'https://churches-in-the-world.onrender.com';
+
 const ChurchesManager = (function() {
     // State
     let currentPage = 1;
@@ -24,7 +27,7 @@ const ChurchesManager = (function() {
         }
 
         try {
-            const response = await fetch(`https://churches-in-the-world.onrender.com/churches?page=${page}&limit=500&search=${encodeURIComponent(search)}`);
+            const response = await fetch(`${API_BASE_URL}/churches?page=${page}&limit=500&search=${encodeURIComponent(search)}`);
             const data = await response.json();
             currentPage = data.pagination.currentPage;
             populateChurchList(data.churches, data.pagination);
@@ -72,7 +75,6 @@ const ChurchesManager = (function() {
 
             const title = document.createElement('div');
             title.className = 'church-title';
-            //console.log('Church daat:', church);
             title.textContent = church.properties.Title || 'Unnamed Church';
 
             const details = document.createElement('div');
@@ -84,7 +86,6 @@ const ChurchesManager = (function() {
                 const parts = church.properties.Address.split(',');
                 city = parts.length > 1 ? parts[parts.length - 2].trim() : parts[0].trim();
             }
-            //console.log('City:', city || 'N/A');
 
             let detailsText = '';
             if (church.properties.Rite) detailsText += church.properties.Rite;
@@ -95,12 +96,17 @@ const ChurchesManager = (function() {
             item.appendChild(title);
             item.appendChild(details);
             
-            // Add click handler to highlight on map
+            // Add click handler to highlight on map (FIXED: Smart panel behavior)
             item.addEventListener('click', () => {
                 if (church.geometry && window.map) {
                     const lat = church.geometry.coordinates[1];
                     const lng = church.geometry.coordinates[0];
-                    //togglePanel("church-list-panel");
+                    
+                    // Only close panel on mobile devices (screen width < 768px)
+                    if (window.innerWidth < 768) {
+                        togglePanelVisibility("church-list-panel", "church-list-content");
+                    }
+                    
                     map.flyTo({ center: [lng, lat], zoom: 18 });
                 }
             });
@@ -116,63 +122,62 @@ const ChurchesManager = (function() {
      * @param {Object} pagination - Pagination information
      * @private
      */
-function updatePaginationControls(pagination) {
-    let paginationElement = document.getElementById('church-list-pagination');
+    function updatePaginationControls(pagination) {
+        let paginationElement = document.getElementById('church-list-pagination');
 
-    // Create container if it doesn't exist
-    if (!paginationElement) {
-        paginationElement = document.createElement('div');
-        paginationElement.id = 'church-list-pagination';
-        paginationElement.className = 'pagination-controls';
-        const churchList = document.getElementById('church-list');
-        if (churchList && churchList.parentNode) {
-            churchList.parentNode.appendChild(paginationElement);
+        // Create container if it doesn't exist
+        if (!paginationElement) {
+            paginationElement = document.createElement('div');
+            paginationElement.id = 'church-list-pagination';
+            paginationElement.className = 'pagination-controls';
+            const churchList = document.getElementById('church-list');
+            if (churchList && churchList.parentNode) {
+                churchList.parentNode.appendChild(paginationElement);
+            }
         }
+
+        // Clear previous content
+        paginationElement.innerHTML = '';
+
+        // Create left, center, right containers
+        const prevContainer = document.createElement('div');
+        prevContainer.className = 'pagination-left';
+
+        const infoContainer = document.createElement('div');
+        infoContainer.className = 'pagination-center';
+
+        const nextContainer = document.createElement('div');
+        nextContainer.className = 'pagination-right';
+
+        // Page info text
+        const start = (pagination.currentPage - 1) * pagination.limit + 1;
+        const end = Math.min(pagination.currentPage * pagination.limit, pagination.total);
+        const info = document.createElement('span');
+        info.id = 'pageInfo';
+        info.textContent = `${start} - ${end} of ${pagination.total}`;
+        infoContainer.appendChild(info);
+
+        // Previous button
+        if (pagination.currentPage > 1) {
+            const prevButton = document.createElement('button');
+            prevButton.textContent = 'Previous';
+            prevButton.onclick = () => loadChurches(pagination.currentPage - 1, currentSearch);
+            prevContainer.appendChild(prevButton);
+        }
+
+        // Next button
+        if (pagination.currentPage < pagination.totalPages) {
+            const nextButton = document.createElement('button');
+            nextButton.textContent = 'Next';
+            nextButton.onclick = () => loadChurches(pagination.currentPage + 1, currentSearch);
+            nextContainer.appendChild(nextButton);
+        }
+
+        // Append containers to main pagination element
+        paginationElement.appendChild(prevContainer);
+        paginationElement.appendChild(infoContainer);
+        paginationElement.appendChild(nextContainer);
     }
-
-    // Clear previous content
-    paginationElement.innerHTML = '';
-
-    // Create left, center, right containers
-    const prevContainer = document.createElement('div');
-    prevContainer.className = 'pagination-left';
-
-    const infoContainer = document.createElement('div');
-    infoContainer.className = 'pagination-center';
-
-    const nextContainer = document.createElement('div');
-    nextContainer.className = 'pagination-right';
-
-    // Page info text
-    const start = (pagination.currentPage - 1) * pagination.limit + 1;
-    const end = Math.min(pagination.currentPage * pagination.limit, pagination.total);
-    const info = document.createElement('span');
-    info.id = 'pageInfo';
-    info.textContent = `${start} - ${end} of ${pagination.total}`;
-    infoContainer.appendChild(info);
-
-    // Previous button
-    if (pagination.currentPage > 1) {
-        const prevButton = document.createElement('button');
-        prevButton.textContent = 'Previous';
-        prevButton.onclick = () => loadChurches(pagination.currentPage - 1, currentSearch);
-        prevContainer.appendChild(prevButton);
-    }
-
-    // Next button
-    if (pagination.currentPage < pagination.totalPages) {
-        const nextButton = document.createElement('button');
-        nextButton.textContent = 'Next';
-        nextButton.onclick = () => loadChurches(pagination.currentPage + 1, currentSearch);
-        nextContainer.appendChild(nextButton);
-    }
-
-    // Append containers to main pagination element
-    paginationElement.appendChild(prevContainer);
-    paginationElement.appendChild(infoContainer);
-    paginationElement.appendChild(nextContainer);
-}
-
 
     /**
      * Sets up church list search functionality
@@ -190,15 +195,8 @@ function updatePaginationControls(pagination) {
                 currentPage = 1;
                 loadChurches(1, currentSearch);
             }, 300);
-    });
-}
-
-function togglePanelVisibility(panelId) {
-    const panel = document.getElementById(panelId);
-    if (panel) {
-        panel.classList.toggle('collapsed');
+        });
     }
-}
 
     /**
      * Initializes church list functionality
@@ -261,12 +259,14 @@ function initializeFilterDropdowns(features) {
     });
 
     // These functions must be available in the global scope or imported here
-    setupSearchableDropdown('title-search', Array.from(uniqueValues.Title).sort());
-    setupSearchableDropdown('city-search', Array.from(uniqueValues.City).sort());
-    setupSearchableDropdown('country-search', Array.from(uniqueValues.Country).sort());
-    setupSearchableDropdown('jurisdiction-search', Array.from(uniqueValues.Jurisdiction).sort());
-    setupSearchableDropdown('type-search', Array.from(uniqueValues.Type).sort());
-    setupSearchableDropdown('rite-search', Array.from(uniqueValues.Rite).sort());
+    if (typeof setupSearchableDropdown === 'function') {
+        setupSearchableDropdown('title-search', Array.from(uniqueValues.Title).sort());
+        setupSearchableDropdown('city-search', Array.from(uniqueValues.City).sort());
+        setupSearchableDropdown('country-search', Array.from(uniqueValues.Country).sort());
+        setupSearchableDropdown('jurisdiction-search', Array.from(uniqueValues.Jurisdiction).sort());
+        setupSearchableDropdown('type-search', Array.from(uniqueValues.Type).sort());
+        setupSearchableDropdown('rite-search', Array.from(uniqueValues.Rite).sort());
+    }
 }
 
 // Expose globally if not using modules
