@@ -34,7 +34,7 @@
                                 osm: {
                                     type: 'raster',
                                     tiles: [
-                                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+                                        'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
                                     ],
                                     tileSize: 256,
                                     attribution: '© OpenStreetMap contributors'
@@ -43,7 +43,7 @@
                                 carto_dark: {
                                     type: 'raster',
                                     tiles: [
-                                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+                                        'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
                                     ],
                                     tileSize: 256,
                                     attribution: '© CARTO © OpenStreetMap contributors'
