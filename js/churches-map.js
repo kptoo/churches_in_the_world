@@ -19,7 +19,7 @@
 
         function initMap() {
             // updateLoadingStatus removed
-            fetch('https://churches.onrender.com/metadata')
+            fetch('https://churches-in-the-world.onrender.com/metadata')
                 .then(response => response.json())
                 .then(meta => {
                     metadata = meta;
@@ -59,7 +59,7 @@
                                 },
                                 parishes: {
                                     type: 'vector',
-                                    tiles: ['https://churches.onrender.com/tiles/{z}/{x}/{y}'],
+                                    tiles: ['https://churches-in-the-world.onrender.com/tiles/{z}/{x}/{y}'],
                                     minzoom: metadata.minzoom || 0,
                                     maxzoom: metadata.maxzoom || 16, // Increased source maxzoom
                                     attribution: metadata.attribution || '',
@@ -460,7 +460,7 @@
 
             const query = new URLSearchParams(filters);
 
-            const response = await fetch(`https://churches.onrender.com/filter?${query.toString()}`);
+            const response = await fetch(`https://churches-in-the-world.onrender.com/filter?${query.toString()}`);
             churchdata = await response.json();
             ChurchesManager.populateChurchList(churchdata.churches, churchdata.pagination);
             zoomToFiltered(churchdata.churches);
@@ -478,7 +478,7 @@
             document.getElementById('rite-search').value = '';
             page = 1; // Reset page to 1
     
-            const response = await fetch(`https://churches.onrender.com/churches?page=${page}&limit=500`);
+            const response = await fetch(`https://churches-in-the-world.onrender.com/churches?page=${page}&limit=500`);
             const data = await response.json();
             ChurchesManager.populateChurchList(data.churches, data.pagination);
             applyFilters(); // Re-apply to show all
