@@ -470,7 +470,7 @@ html, body, #map {
         display: block;
     }
     
-    .leaflet-control-locate {
+    .maplibregl-ctrl-geolocate {
         margin-top: 50px !important; /* More space for controls */
     }
     
@@ -480,16 +480,17 @@ html, body, #map {
         padding: 12px 10px; /* Taller for better touch targets */
     }
     
-    /* Enhanced touch targets for leaflet controls */
-    .leaflet-touch .leaflet-control-layers, 
-    .leaflet-touch .leaflet-bar a {
+    /* Enhanced touch targets for MapLibre controls */
+    .maplibregl-ctrl, 
+    .maplibregl-ctrl-group button {
         min-width: 35px; /* Increased from 30px */
         min-height: 35px; /* Increased from 30px */
         line-height: 35px; /* Match the min-height */
     }
     
     /* Improved visibility for map controls */
-    .leaflet-control-zoom a {
+    .maplibregl-ctrl-zoom-in,
+    .maplibregl-ctrl-zoom-out {
         font-size: 18px !important; /* Larger icons */
         font-weight: bold;
     }
@@ -665,45 +666,45 @@ html, body, #map {
 }
 
 /* Mobile popup styling to ensure visibility */
-.mobile-popup .leaflet-popup-content-wrapper {
+.mobile-popup .maplibregl-popup-content-wrapper {
     max-width: 280px;
     font-size: 14px;
 }
 
-.mobile-popup .leaflet-popup-content {
+.mobile-popup .maplibregl-popup-content {
     margin: 10px 12px;
     line-height: 1.5;
 }
 
-.mobile-popup .leaflet-popup-close-button {
+.mobile-popup .maplibregl-popup-close-button {
     padding: 6px 6px 0 0; /* Larger touch target */
     font-size: 18px; /* Larger X button */
 }
 
 /* Ensure popup is visible and not cut off on mobile */
-.leaflet-popup {
+.maplibregl-popup {
     margin-bottom: 0; /* Adjust position to ensure visibility */
 }
 
 /* Fix for popup being cut off at the bottom on mobile */
-.leaflet-popup-tip-container {
+.maplibregl-popup-tip-container {
     margin-top: -1px;
 }
 
 /* Fix for popup not appearing */
-.leaflet-popup-content-wrapper {
+.maplibregl-popup-content-wrapper {
     max-height: none !important;
     overflow: visible !important;
 }
 
 /* Make popups more visible with brighter background */
-.leaflet-popup-content-wrapper {
+.maplibregl-popup-content-wrapper {
     background-color: rgba(255, 255, 255, 0.95) !important;
     border: 2px solid rgba(0, 51, 102, 0.5) !important;
 }
 
 /* Make sure popup tips are visible */
-.leaflet-popup-tip {
+.maplibregl-popup-tip {
     background-color: rgba(255, 255, 255, 0.95) !important;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3) !important;
 }
@@ -802,7 +803,7 @@ html, body, #map {
     }
 
     /* Adjust map controls to not overlap with the circular buttons */
-    .leaflet-top.leaflet-right {
+    .maplibregl-ctrl-top-right {
         margin-top: 60px;
     }
 
@@ -1209,26 +1210,31 @@ html, body, #map {
 
 
 /*----------------------------------------------------------------------*/
-/* Additional styles specific to MapLibre integration if needed 
-.maplibregl-popup-content {
-    font-family: Arial, Helvetica, sans-serif;
-    padding: 10px;
-    max-width: 250px;
-    width:250px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-.maplibregl-popup-close-button {
-    font-size: 18px;
-    padding: 5px;
-}*/
-
-.mapboxgl-ctrl-geolocate { /* Style MapLibre geolocate like reference */
+/* MapLibre GL JS Geolocate Control Styling */
+.maplibregl-ctrl-geolocate {
     width: 30px !important;
     height: 30px !important;
     border-radius: 4px !important;
 }
-.mapboxgl-ctrl-geolocate .mapboxgl-ctrl-icon {
-     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23333'%3E%3Cpath d='M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z'/%3E%3C/svg%3E") !important;
+
+.maplibregl-ctrl-geolocate .maplibregl-ctrl-icon {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23333'%3E%3Cpath d='M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z'/%3E%3C/svg%3E") !important;
+}
+
+/* Style Switcher Button */
+.style-switcher-btn {
+    font-size: 16px !important;
+    width: 30px !important;
+    height: 30px !important;
+    border: none !important;
+    background: white !important;
+    cursor: pointer !important;
+    border-radius: 4px !important;
+    transition: background-color 0.2s ease !important;
+}
+
+.style-switcher-btn:hover {
+    background-color: #f0f0f0 !important;
 }
 
 /*-----------------------------------------------------------------*/
