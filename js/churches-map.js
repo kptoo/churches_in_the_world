@@ -8,6 +8,9 @@
         const clusterLayerId = 'clusters';
         const clusterCountLayerId = 'cluster-count';
 
+        // API Configuration - Your Render server URL
+        const API_BASE_URL = 'https://churches-in-the-world.onrender.com';
+
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', function() {
             initMap();
@@ -18,8 +21,7 @@
         });
 
         function initMap() {
-            // updateLoadingStatus removed
-            fetch('https://churches-in-the-world.onrender.com/metadata')
+            fetch(`${API_BASE_URL}/metadata`)
                 .then(response => response.json())
                 .then(meta => {
                     metadata = meta;
@@ -27,58 +29,63 @@
                     
                     map = new maplibregl.Map({
                         container: 'map',
-                        style: { // Free style with OpenStreetMap raster + our vector source
+                        style: {
                             version: 8,
                             sources: {
-                                // Using free OpenStreetMap tiles
-                                osm: {
-                                    type: 'raster',
-                                    tiles: [
-                                        'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
-                                    ],
-                                    tileSize: 256,
-                                    attribution: '© OpenStreetMap contributors'
-                                },
-                                // Alternative: Dark theme using CartoDB
+                                // CartoDB Dark - Full zoom coverage (0-20), no rate limits
                                 carto_dark: {
                                     type: 'raster',
                                     tiles: [
-                                        'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
+                                        'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
                                     ],
                                     tileSize: 256,
-                                    attribution: '© CARTO © OpenStreetMap contributors'
+                                    attribution: '© CARTO © OpenStreetMap contributors',
+                                    subdomains: ['a', 'b', 'c', 'd'],
+                                    minzoom: 0,
+                                    maxzoom: 20
                                 },
-                                // Alternative: Stamen Toner (dark style)
-                                stamen_toner: {
+                                // Stadia Dark (backup option)
+                                stadia_dark: {
                                     type: 'raster',
                                     tiles: [
-                                        'https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png'
+                                        'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
                                     ],
                                     tileSize: 256,
-                                    attribution: 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
+                                    attribution: '© Stadia Maps © OpenMapTiles © OpenStreetMap contributors',
+                                    minzoom: 0,
+                                    maxzoom: 20
+                                },
+                                // OpenStreetMap (always reliable)
+                                osm: {
+                                    type: 'raster',
+                                    tiles: [
+                                        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                                    ],
+                                    tileSize: 256,
+                                    attribution: '© OpenStreetMap contributors',
+                                    subdomains: ['a', 'b', 'c'],
+                                    minzoom: 0,
+                                    maxzoom: 19
                                 },
                                 parishes: {
                                     type: 'vector',
-                                    tiles: ['https://churches-in-the-world.onrender.com/tiles/{z}/{x}/{y}'],
+                                    tiles: [`${API_BASE_URL}/tiles/{z}/{x}/{y}`],
                                     minzoom: metadata.minzoom || 0,
-                                    maxzoom: metadata.maxzoom || 16, // Increased source maxzoom
+                                    maxzoom: metadata.maxzoom || 16,
                                     attribution: metadata.attribution || '',
-                                    // Enable clustering
                                     cluster: true,
-                                    clusterMaxZoom: 18, // Increased cluster break zoom
-                                    clusterRadius: 100 // Radius of each cluster when clustering points (defaults to 50)
+                                    clusterMaxZoom: 18,
+                                    clusterRadius: 100
                                 }
                             },
                             layers: [
-                                // Use CartoDB dark theme by default (similar to Mapbox navigation-night)
+                                // Start with CartoDB dark (most reliable)
                                 { id: 'base-tiles', type: 'raster', source: 'carto_dark' }
-                                // Church layers will be added in onMapLoad
                             ],
-                            // Add glyphs URL for text rendering
                             glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf"
                         },
-                        center: [0, 0], // Default center
-                        zoom: metadata.minzoom, // Default zoom
+                        center: [0, 0],
+                        zoom: metadata.minzoom,
                         worldCopyJump: true
                     });
 
@@ -91,24 +98,21 @@
                     });
                     map.addControl(geolocateControl, 'top-left');
 
-                    // Add style switcher control
-                    addStyleSwitcher();
+                    // Add enhanced style switcher
+                    addDarkStyleSwitcher();
 
                     // --- Map Event Listeners ---
                     map.on('load', onMapLoad);
-                    map.on('idle', onMapIdle); // Use idle to query features after map settles
-                    // Click listener for unclustered points
+                    map.on('idle', onMapIdle);
                     map.on('click', churchLayerId, handleFeatureClick);
-                    // Click listener for clusters
                     map.on('click', clusterLayerId, handleClusterClick);
-                    // Hover effects
                     map.on('mouseenter', churchLayerId, () => map.getCanvas().style.cursor = 'pointer');
                     map.on('mouseleave', churchLayerId, () => map.getCanvas().style.cursor = '');
                     map.on('mouseenter', clusterLayerId, () => map.getCanvas().style.cursor = 'pointer');
                     map.on('mouseleave', clusterLayerId, () => map.getCanvas().style.cursor = '');
 
                     // Link "My Location" button to MapLibre control
-                    document.getElementById('action-my-location').addEventListener('click', () => {
+                    document.getElementById('action-my-location')?.addEventListener('click', () => {
                         geolocateControl.trigger();
                         hideMobileMenu();
                     });
@@ -116,26 +120,46 @@
                 })
                 .catch(error => {
                     console.error('Error loading metadata:', error);
-                    // updateLoadingStatus removed
                 });
         }
 
-        function addStyleSwitcher() {
-            // Create style switcher control
-            class StyleSwitcher {
+        function addDarkStyleSwitcher() {
+            class DarkStyleSwitcher {
                 onAdd(map) {
                     this._map = map;
                     this._container = document.createElement('div');
                     this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group';
                     
                     const button = document.createElement('button');
-                    button.className = 'style-switcher-btn';
-                    button.innerHTML = '🎨';
-                    button.title = 'Switch Map Style';
+                    button.innerHTML = '🌙';
+                    button.title = 'Switch Dark Style';
                     button.style.cssText = 'font-size: 16px; width: 30px; height: 30px; border: none; background: white; cursor: pointer;';
                     
                     button.addEventListener('click', () => {
-                        this.switchStyle();
+                        const currentStyle = this._map.getStyle();
+                        const currentSource = currentStyle.layers[0].source;
+                        
+                        let newSource;
+                        switch(currentSource) {
+                            case 'carto_dark':
+                                newSource = 'stadia_dark';
+                                break;
+                            case 'stadia_dark':
+                                newSource = 'osm';
+                                break;
+                            case 'osm':
+                                newSource = 'carto_dark';
+                                break;
+                            default:
+                                newSource = 'carto_dark';
+                        }
+                        
+                        this._map.removeLayer('base-tiles');
+                        this._map.addLayer({
+                            id: 'base-tiles',
+                            type: 'raster',
+                            source: newSource
+                        }, churchLayerId);
                     });
                     
                     this._container.appendChild(button);
@@ -146,41 +170,12 @@
                     this._container.parentNode.removeChild(this._container);
                     this._map = undefined;
                 }
-
-                switchStyle() {
-                    const currentStyle = this._map.getStyle();
-                    const currentSource = currentStyle.layers[0].source;
-                    
-                    let newSource;
-                    switch(currentSource) {
-                        case 'carto_dark':
-                            newSource = 'osm';
-                            break;
-                        case 'osm':
-                            newSource = 'stamen_toner';
-                            break;
-                        case 'stamen_toner':
-                            newSource = 'carto_dark';
-                            break;
-                        default:
-                            newSource = 'carto_dark';
-                    }
-                    
-                    this._map.setLayoutProperty('base-tiles', 'visibility', 'none');
-                    this._map.removeLayer('base-tiles');
-                    this._map.addLayer({
-                        id: 'base-tiles',
-                        type: 'raster',
-                        source: newSource
-                    }, churchLayerId); // Add before church layers
-                }
             }
 
-            map.addControl(new StyleSwitcher(), 'top-left');
+            map.addControl(new DarkStyleSwitcher(), 'top-left');
         }
 
         function onMapLoad() {
-            // updateLoadingStatus removed
             // Load custom icons
             map.loadImage('cathedral-icon.png', (error, image) => {
                 if (error) { console.error('Error loading cathedral-icon:', error); return; }
@@ -194,11 +189,7 @@
                         if (error) { console.error('Error loading church-icon:', error); return; }
                         if (!map.hasImage('church-icon')) map.addImage('church-icon', image);
 
-                    // updateLoadingStatus removed
                     addMapLayers();
-                    // updateLoadingStatus removed
-                    // Initial query moved to onMapIdle
-                    // setTimeout(queryAndPopulateFeatures, 500); // Removed
                     });
                 });
             });
@@ -210,7 +201,7 @@
                 id: clusterLayerId,
                 type: 'circle',
                 source: 'parishes',
-                'source-layer': sourceLayerId, // Added missing source-layer
+                'source-layer': sourceLayerId,
                 filter: ['has', 'point_count'],
                 paint: {
                     'circle-color': [
@@ -222,7 +213,7 @@
                         200, '#d97706',  // 200-499 (dark orange)
                         500, '#b45309'   // 500+ (brown)
                     ],
-                    'circle-radius': [ // Reduced radii
+                    'circle-radius': [
                         'step', ['get', 'point_count'],
                         10, // radius for < 10 points
                         10, 6, // radius for 10-49 points
@@ -242,11 +233,10 @@
                 id: clusterCountLayerId,
                 type: 'symbol',
                 source: 'parishes',
-                'source-layer': sourceLayerId, // Added missing source-layer
+                'source-layer': sourceLayerId,
                 filter: ['has', 'point_count'],
                 layout: {
                     'text-field': '{point_count_abbreviated}',
-                    // Changed font to one available at the glyphs URL
                     'text-font': ['Noto Sans Regular'],
                     'text-size': 8,
                     'text-allow-overlap': true
@@ -261,8 +251,8 @@
                 id: churchLayerId,
                 type: 'symbol',
                 source: 'parishes',
-                'source-layer': sourceLayerId, // Make sure this matches your MBTiles layer name
-                filter: ['!', ['has', 'point_count']], // Filter out clusters
+                'source-layer': sourceLayerId,
+                filter: ['!', ['has', 'point_count']],
                 layout: {
                     'icon-image': [
                     'case',
@@ -271,29 +261,19 @@
                     ['>=', ['index-of', 'monument', ['downcase', ['get', 'Title']]], 0], 'monument-icon',
                     'church-icon' // default icon
                     ],
-
-                                            // Simplified icon size - removed problematic 'includes' expression
                     'icon-size': 0.05,
-                    'icon-allow-overlap': false, // Prevent overlap for individual icons
+                    'icon-allow-overlap': false,
                     'icon-ignore-placement': false,
                     'icon-anchor': 'bottom'
-                    // Add text label if desired
-                    // 'text-field': ['get', 'Title'],
-                    // 'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                    // 'text-size': 10,
-                    // 'text-offset': [0, -1.5],
-                    // 'text-anchor': 'top'
                 },
                 paint: {
-                    // Add paint properties if needed (e.g., icon opacity)
+                    // Add paint properties if needed
                 }
             });
         }
 
         function onMapIdle() {
             // This function is called when the map settles after movement or zooming.
-            // No longer querying features for list here.
-            //console.log("Map idle.");
         }
 
         // --- Feature Interaction ---
@@ -303,7 +283,6 @@
             const coordinates = feature.geometry.coordinates.slice();
             const properties = feature.properties;
 
-
             // Extract city from address if not present
             let city = properties.City || 'N/A';
             if ((city === 'N/A' || !city) && properties.Address) {
@@ -311,7 +290,7 @@
                  if (addressParts.length >= 2) {
                      city = addressParts[addressParts.length - 2].trim();
                  } else if (addressParts.length === 1) {
-                     city = addressParts[0].trim(); // Fallback if only one part
+                     city = addressParts[0].trim();
                  }
             }
 
@@ -331,19 +310,17 @@
                 .setHTML(popupContent)
                 .addTo(map);
 
-            // Highlight in list
-            highlightChurchInList(feature.id); // Assuming features have a unique ID property
+            highlightChurchInList(feature.id);
         }
 
         function handleClusterClick(e) {
              if (!e.features || !e.features.length) return;
              const features = map.queryRenderedFeatures(e.point, { layers: [clusterLayerId] });
-             if (!features.length) return; // Exit if no cluster feature found
+             if (!features.length) return;
 
-             // Zoom in on cluster click (removed getClusterExpansionZoom)
              map.easeTo({
                  center: features[0].geometry.coordinates,
-                 zoom: map.getZoom() + 2 // Zoom in by 2 levels
+                 zoom: map.getZoom() + 2
              });
         }
 
@@ -355,7 +332,6 @@
                 targetItem.style.backgroundColor = '#e6f0ff';
                 const listContainer = document.getElementById('church-list');
                 if (listContainer) {
-                    // Scroll into view if needed
                     const itemRect = targetItem.getBoundingClientRect();
                     const containerRect = listContainer.getBoundingClientRect();
                     if (itemRect.top < containerRect.top || itemRect.bottom > containerRect.bottom) {
@@ -367,14 +343,13 @@
 
         // --- Filtering Logic ---
         function setupFilterListeners() {
-            document.getElementById('title-search').addEventListener('input', debounce(applyFilters, 300));
-            document.getElementById('city-search').addEventListener('input', debounce(applyFilters, 300));
-            document.getElementById('country-search').addEventListener('input', debounce(applyFilters, 300));
-            document.getElementById('jurisdiction-search').addEventListener('input', debounce(applyFilters, 300));
-            document.getElementById('type-search').addEventListener('input', debounce(applyFilters, 300));
-            document.getElementById('rite-search').addEventListener('input', debounce(applyFilters, 300));
-            document.getElementById('reset-filters').addEventListener('click', resetFilters);
-            //document.getElementById('zoom-to-filter').addEventListener('click', zoomToFiltered(churchdata.churches));
+            document.getElementById('title-search')?.addEventListener('input', debounce(applyFilters, 300));
+            document.getElementById('city-search')?.addEventListener('input', debounce(applyFilters, 300));
+            document.getElementById('country-search')?.addEventListener('input', debounce(applyFilters, 300));
+            document.getElementById('jurisdiction-search')?.addEventListener('input', debounce(applyFilters, 300));
+            document.getElementById('type-search')?.addEventListener('input', debounce(applyFilters, 300));
+            document.getElementById('rite-search')?.addEventListener('input', debounce(applyFilters, 300));
+            document.getElementById('reset-filters')?.addEventListener('click', resetFilters);
         }
         
         let filters = {
@@ -390,12 +365,12 @@
 
 		function applyFilters() {
 			 filters = {
-				title: document.getElementById('title-search').value.trim().toLowerCase(),
-				country: document.getElementById('country-search').value.trim().toLowerCase(),
-				type: document.getElementById('type-search').value.trim().toLowerCase(),
-				address: document.getElementById('city-search').value.trim().toLowerCase(),
-				rite: document.getElementById('rite-search').value.trim().toLowerCase(),
-				jurisdiction: document.getElementById('jurisdiction-search').value.trim().toLowerCase()
+				title: document.getElementById('title-search')?.value.trim().toLowerCase() || '',
+				country: document.getElementById('country-search')?.value.trim().toLowerCase() || '',
+				type: document.getElementById('type-search')?.value.trim().toLowerCase() || '',
+				address: document.getElementById('city-search')?.value.trim().toLowerCase() || '',
+				rite: document.getElementById('rite-search')?.value.trim().toLowerCase() || '',
+				jurisdiction: document.getElementById('jurisdiction-search')?.value.trim().toLowerCase() || ''
 			};
 
 			updateMapFilter(filters);
@@ -404,7 +379,6 @@
 		async function updateMapFilter(filters) {
 			const filterExpressions = ['all'];
 
-			// Add a filter for each non-empty field
 			if (filters.title) {
 				filterExpressions.push([
 					'in',
@@ -453,20 +427,21 @@
 				]);
 			}
 
-			// Apply the filter only to individual church features
 			map.setFilter(churchLayerId, filterExpressions);
 			map.setFilter(clusterCountLayerId, filterExpressions);
 			map.setFilter(clusterLayerId, filterExpressions);
 
             const query = new URLSearchParams(filters);
 
-            const response = await fetch(`https://churches-in-the-world.onrender.com/filter?${query.toString()}`);
-            churchdata = await response.json();
-            ChurchesManager.populateChurchList(churchdata.churches, churchdata.pagination);
-            zoomToFiltered(churchdata.churches);
-
+            try {
+                const response = await fetch(`${API_BASE_URL}/filter?${query.toString()}`);
+                churchdata = await response.json();
+                ChurchesManager.populateChurchList(churchdata.churches, churchdata.pagination);
+                zoomToFiltered(churchdata.churches);
+            } catch (error) {
+                console.error('Error applying filters:', error);
+            }
 		}
-
 
         async function resetFilters() {
             console.log("Resetting filters");
@@ -476,16 +451,18 @@
             document.getElementById('jurisdiction-search').value = '';
             document.getElementById('type-search').value = '';
             document.getElementById('rite-search').value = '';
-            page = 1; // Reset page to 1
-    
-            const response = await fetch(`https://churches-in-the-world.onrender.com/churches?page=${page}&limit=500`);
-            const data = await response.json();
-            ChurchesManager.populateChurchList(data.churches, data.pagination);
-            applyFilters(); // Re-apply to show all
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/churches?page=1&limit=500`);
+                const data = await response.json();
+                ChurchesManager.populateChurchList(data.churches, data.pagination);
+                applyFilters();
+            } catch (error) {
+                console.error('Error resetting filters:', error);
+            }
         }
 
         function zoomToFiltered(features) {
-            //console.log(features);
             if (!map || !Array.isArray(features) || features.length === 0) return;
 
             const bounds = new maplibregl.LngLatBounds();
@@ -504,10 +481,8 @@
             }
         }
 
-
         // --- UI Panel and Controls ---
         function setupPanelControls() {
-            // Mobile quick actions button
             const quickActionsBtn = document.getElementById('mobile-quick-actions');
             const menu = document.getElementById('mobile-actions-menu');
             if (quickActionsBtn && menu) {
@@ -517,13 +492,12 @@
                         hideMobileMenu();
                     } else {
                         menu.style.display = 'flex';
-                        void menu.offsetWidth; // Trigger reflow
+                        void menu.offsetWidth;
                         menu.classList.add('visible');
                         quickActionsBtn.textContent = '×';
                         updateMobileMenuIndicators();
                     }
                 });
-                // Hide menu if clicking outside
                 document.addEventListener('click', (e) => {
                      if (!menu.contains(e.target) && e.target !== quickActionsBtn) {
                          hideMobileMenu();
@@ -531,7 +505,6 @@
                 });
             }
 
-            // Mobile action items
             document.querySelectorAll('.mobile-action-item').forEach(item => {
                 item.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -543,13 +516,11 @@
                     } else if (this.id === 'action-hide-all-panels') {
                         hideAllPanels();
                     }
-                    // "My Location" is handled directly in initMap
 
-                    hideMobileMenu(); // Hide menu after action
+                    hideMobileMenu();
                 });
             });
 
-             // Hide church list button (mobile only, though CSS might hide it)
              const hideListBtn = document.getElementById('hide-church-list');
              if (hideListBtn) {
                  hideListBtn.addEventListener('click', () => {
@@ -565,7 +536,7 @@
             if (menu && menu.classList.contains('visible')) {
                 menu.classList.remove('visible');
                 if(quickActionsBtn) quickActionsBtn.textContent = '+';
-                setTimeout(() => { menu.style.display = 'none'; }, 300); // Hide after transition
+                setTimeout(() => { menu.style.display = 'none'; }, 300);
             }
         }
 
@@ -581,9 +552,8 @@
         }
 
        function togglePanel(contentId) {
-            // Check if the click originated from the close button
             if (event && event.target.classList.contains('close-button')) {
-                return; // Do nothing if it's the close button
+                return;
             }
 
             const content = document.getElementById(contentId);
@@ -593,7 +563,7 @@
 
             if (content.classList.contains('collapsed')) {
                 content.classList.remove('collapsed');
-                content.style.display = 'block'; // Or 'grid', 'flex', etc. depending on layout
+                content.style.display = 'block';
                 if (toggleBtn) toggleBtn.textContent = '−';
             } else {
                 content.classList.add('collapsed');
@@ -609,46 +579,42 @@
             if (panel.style.display === 'none' || !panel.style.display) {
                 if (panelId === "church-list-panel"){
                         const filterPanel = document.getElementById("filter-panel");
-                        filterPanel.style.display = 'none';
+                        if (filterPanel) filterPanel.style.display = 'none';
 
                         const legendPanel = document.getElementById("legend");
-                        legendPanel.style.display = 'none';
+                        if (legendPanel) legendPanel.style.display = 'none';
 
                         panel.style.display = 'block';
 
-                        // Ensure content is also visible if panel is shown
                         const content = document.getElementById(contentId);
                         if (content && content.classList.contains('collapsed')) {
-                            togglePanel(contentId); // Expand content
+                            togglePanel(contentId);
                         }
 
-                } if (panelId === "filter-panel") {
+                } else if (panelId === "filter-panel") {
                         const listPanel = document.getElementById("church-list-panel");
-                        listPanel.style.display = 'none';
+                        if (listPanel) listPanel.style.display = 'none';
                         const legendPanel = document.getElementById("legend");
-                        legendPanel.style.display = 'none';
+                        if (legendPanel) legendPanel.style.display = 'none';
 
                         panel.style.display = 'block';
 
-                        // Ensure content is also visible if panel is shown
                         const content = document.getElementById(contentId);
                         if (content && content.classList.contains('collapsed')) {
-                            togglePanel(contentId); // Expand content
+                            togglePanel(contentId);
                         }
                 } else {
                         const filterPanel = document.getElementById("filter-panel");
-                        filterPanel.style.display = 'none';
+                        if (filterPanel) filterPanel.style.display = 'none';
                         const listPanel = document.getElementById("church-list-panel");
-                        listPanel.style.display = 'none';
+                        if (listPanel) listPanel.style.display = 'none';
 
                         panel.style.display = 'block';
 
-                        // Ensure content is also visible if panel is shown
                         const content = document.getElementById(contentId);
                         if (content && content.classList.contains('collapsed')) {
-                            togglePanel(contentId); // Expand content
+                            togglePanel(contentId);
                         }
-
                 }
 
             } else {
@@ -665,8 +631,6 @@
          }
 
         function initPanels() {
-            // Show panels by default on desktop, hide on mobile (CSS handles initial state)
-            // Ensure content is collapsed initially
             document.querySelectorAll('.panel-content').forEach(content => {
                  if (!content.classList.contains('collapsed')) {
                      content.classList.add('collapsed');
@@ -676,10 +640,8 @@
                  if (toggleBtn) toggleBtn.textContent = '+';
             });
 
-             // Desktop specific overrides if needed (CSS handles most of this)
              if (window.innerWidth >= 768) {
-                 // Example: Ensure filter panel content is visible on desktop load
-                 // togglePanel('filter-content');
+                 // Desktop specific overrides if needed
              }
         }
 
@@ -691,19 +653,17 @@
 
             if (!input) return;
 
-            // Create container if it doesn't exist
             if (!suggestionsContainer) {
                 suggestionsContainer = document.createElement('div');
                 suggestionsContainer.className = 'dropdown-list';
                 suggestionsContainer.id = suggestionsContainerId;
                 input.parentNode.appendChild(suggestionsContainer);
 
-                // Add click handler for suggestions
                 suggestionsContainer.addEventListener('click', (e) => {
                     if (e.target.classList.contains('dropdown-item')) {
                         input.value = e.target.textContent === 'All' ? '' : e.target.textContent;
                         hideSuggestions(inputId);
-                        applyFilters(); // Apply filter after selection
+                        applyFilters();
                     }
                 });
             }
@@ -712,11 +672,10 @@
                 const query = input.value.toLowerCase();
                 const matches = items.filter(item =>
                     item && item.toLowerCase().includes(query)
-                ).slice(0, 10); // Limit suggestions
+                ).slice(0, 10);
 
-                suggestionsContainer.innerHTML = ''; // Clear previous
+                suggestionsContainer.innerHTML = '';
 
-                // Add "All" option
                 const allItem = document.createElement('div');
                 allItem.className = 'dropdown-item';
                 allItem.textContent = 'All';
@@ -733,9 +692,7 @@
 
             input.addEventListener('input', debounce(displaySuggestions, 200));
             input.addEventListener('focus', displaySuggestions);
-
-            // Hide on blur or click outside
-            input.addEventListener('blur', () => setTimeout(() => hideSuggestions(inputId), 150)); // Delay to allow click on suggestion
+            input.addEventListener('blur', () => setTimeout(() => hideSuggestions(inputId), 150));
         }
 
         function hideSuggestions(inputId) {
