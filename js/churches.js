@@ -100,7 +100,7 @@ const ChurchesManager = (function() {
                 if (church.geometry && window.map) {
                     const lat = church.geometry.coordinates[1];
                     const lng = church.geometry.coordinates[0];
-                    togglePanel("church-list-panel");
+                    //togglePanel("church-list-panel");
                     map.flyTo({ center: [lng, lat], zoom: 18 });
                 }
             });
