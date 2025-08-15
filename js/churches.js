@@ -2,8 +2,8 @@
  * churches.js - Handles church list functionality with server-side pagination and search
  */
 
-// API Configuration
-const API_BASE_URL = 'https://churches-in-the-world.onrender.com';
+// NOTE: API_BASE_URL is declared in churches-map.js, so we reference it from there
+// Do NOT declare it again here to avoid conflicts
 
 const ChurchesManager = (function() {
     // State
@@ -27,7 +27,8 @@ const ChurchesManager = (function() {
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/churches?page=${page}&limit=500&search=${encodeURIComponent(search)}`);
+            // Use the global API_BASE_URL declared in churches-map.js
+            const response = await fetch(`${window.API_BASE_URL || 'https://churches-in-the-world.onrender.com'}/churches?page=${page}&limit=500&search=${encodeURIComponent(search)}`);
             const data = await response.json();
             currentPage = data.pagination.currentPage;
             populateChurchList(data.churches, data.pagination);
@@ -104,7 +105,9 @@ const ChurchesManager = (function() {
                     
                     // Only close panel on mobile devices (screen width < 768px)
                     if (window.innerWidth < 768) {
-                        togglePanelVisibility("church-list-panel", "church-list-content");
+                        if (typeof togglePanelVisibility === 'function') {
+                            togglePanelVisibility("church-list-panel", "church-list-content");
+                        }
                     }
                     
                     map.flyTo({ center: [lng, lat], zoom: 18 });
