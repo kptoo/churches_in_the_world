@@ -8,8 +8,11 @@
         const clusterLayerId = 'clusters';
         const clusterCountLayerId = 'cluster-count';
 
-        // API Configuration - Your Render server URL
+        // API Configuration - Your Render server URL (made global)
         const API_BASE_URL = 'https://churches-in-the-world.onrender.com';
+        
+        // Make API_BASE_URL globally available for other scripts
+        window.API_BASE_URL = API_BASE_URL;
 
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', function() {
