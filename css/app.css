@@ -6,6 +6,18 @@ html, body, #map {
     margin: 0;
 }
 
+/* BLUE TINT FOR MAP - Makes dark map more blue */
+.maplibregl-canvas {
+    filter: hue-rotate(210deg) saturate(1.3) brightness(0.9) !important;
+}
+
+/* Alternative blue tints - uncomment to try different effects */
+/*
+.maplibregl-canvas {
+    filter: hue-rotate(220deg) saturate(1.5) brightness(0.85) contrast(1.1) !important;
+}
+*/
+
 .close-button {
     position: absolute;
     top: 5px;
@@ -96,7 +108,6 @@ html, body, #map {
     right: 10px;
 }
 
-
 #church-list-panel {
     top: 10px;
     right: 290px;
@@ -110,7 +121,6 @@ html, body, #map {
     #church-list-panel {
         display: none;
     }
-
 }
 
 /* Mobile-specific adjustments */
@@ -229,7 +239,6 @@ html, body, #map {
     .top-left-buttons button:active {
         transform: scale(0.95);
     }
-
 }
 
 #church-list {
@@ -258,7 +267,6 @@ html, body, #map {
 .filter-section {
     margin-bottom: 15px;
 }
-
 
 /* Church list item */
 .church-item {
@@ -813,8 +821,7 @@ html, body, #map {
     }
 }
 
-
-   .peeking-button-container {
+.peeking-button-container {
     position: fixed; /* Stick to viewport */
     top: 65%;
     left: -10px;
@@ -871,129 +878,128 @@ html, body, #map {
     }
 }
 
+/*---------------------------------------------------------------------------------*/
+#pope-icon {
+background-color: #FFFFFF; /* White */
+border-radius: 50%;
+}
 
-    /*---------------------------------------------------------------------------------*/
-    #pope-icon {
+#saint-icon {
     background-color: #FFFFFF; /* White */
     border-radius: 50%;
-    }
+}
 
-    #saint-icon {
-        background-color: #FFFFFF; /* White */
-        border-radius: 50%;
-    }
+#miracle-icon {
+    background-color: #FFFFFF; /* White */
+    border-radius: 50%;
+}
 
-    #miracle-icon {
-        background-color: #FFFFFF; /* White */
-        border-radius: 50%;
-    }
+.legend-circle {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    border: 1px solid #444;
+}
 
-    .legend-circle {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        display: inline-block;
-        margin-right: 6px;
-        border: 1px solid #444;
-    }
+/*------------------------------------------------------------------------------------*/
+/* Hamburger styles */
+.hamburger {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 30px;
+    height: 25px;
+    cursor: pointer;
+    z-index: 10001;
+}
 
-    /*------------------------------------------------------------------------------------*/
-    /* Hamburger styles */
-    .hamburger {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        width: 30px;
-        height: 25px;
-        cursor: pointer;
-        z-index: 10001;
-    }
-
-    .hamburger div {
-        width: 100%;
-        height: 4px;
-        background: hsl(100, 100%, 100%); /* Dark blue to match .church-title */
-        margin: 5px 0;
-    }
+.hamburger div {
+    width: 100%;
+    height: 4px;
+    background: hsl(100, 100%, 100%); /* Dark blue to match .church-title */
+    margin: 5px 0;
+}
 
 /*--------------------------------------------------------------------------------------------*/
-    /* Panel styling */
-    .panel-v2 {
-        position: fixed;
-        top: 20px;
-        right: 60px; /* Next to hamburger */
-        width: 250px;
-        background: #ffffff; /* White background */
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        padding: 10px;
-        display: none;
-        flex-direction: column;
-        gap: 10px;
-        z-index: 10000;
-    }
+/* Panel styling */
+.panel-v2 {
+    position: fixed;
+    top: 20px;
+    right: 60px; /* Next to hamburger */
+    width: 250px;
+    background: #ffffff; /* White background */
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    padding: 10px;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 10000;
+}
 
-    .panel-v2.show {
-        display: flex;
-    }
+.panel-v2.show {
+    display: flex;
+}
 
-    /* Menu list styles */
-    .menu ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
+/* Menu list styles */
+.menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
 
-    .menu li {
-        padding: 12px;
-        border-bottom: 1px solid #cce0ff; /* Light blue border */
-        cursor: pointer;
-        background-color: transparent;
-        transition: background-color 0.2s;
-        font-size: 14px;
-        font-weight: bold;
-        color: #003366; /* Dark blue text */
-    }
+.menu li {
+    padding: 12px;
+    border-bottom: 1px solid #cce0ff; /* Light blue border */
+    cursor: pointer;
+    background-color: transparent;
+    transition: background-color 0.2s;
+    font-size: 14px;
+    font-weight: bold;
+    color: #003366; /* Dark blue text */
+}
 
-    .menu li:hover,
-    .menu li:active {
-        background-color: #e6f0ff; /* Light blue hover */
-    }
+.menu li:hover,
+.menu li:active {
+    background-color: #e6f0ff; /* Light blue hover */
+}
 
-    /* Search box */
-    #searchBox {
-        padding: 6px;
-        width: 100%;
-        box-sizing: border-box;
-        font-size: 12px;
-        border: 1px solid #cce0ff;
-        color: #003366;
-    }
+/* Search box */
+#searchBox {
+    padding: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 12px;
+    border: 1px solid #cce0ff;
+    color: #003366;
+}
 
-    /* Data list */
-    #dataList {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        max-height: 500px;
-        overflow-y: auto;
-    }
+/* Data list */
+#dataList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 500px;
+    overflow-y: auto;
+}
 
-    #dataList li {
-        padding: 12px;
-        border-bottom: 1px solid #cce0ff;
-        cursor: pointer;
-        font-size: 12px;
-        color: #4682B4; /* Steel blue to match .church-details */
-        transition: background-color 0.2s;
-    }
+#dataList li {
+    padding: 12px;
+    border-bottom: 1px solid #cce0ff;
+    cursor: pointer;
+    font-size: 12px;
+    color: #4682B4; /* Steel blue to match .church-details */
+    transition: background-color 0.2s;
+}
 
-    #dataList li:hover {
-        background-color: #e6f0ff;
-        color: #003366; /* Dark blue on hover for better visibility */
-    }
+#dataList li:hover {
+    background-color: #e6f0ff;
+    color: #003366; /* Dark blue on hover for better visibility */
+}
 
-    /*---------------------------------------------------------------------
-    /* Always-visible Legend V2 */
+/*---------------------------------------------------------------------
+/* Always-visible Legend V2 */
 #legend-v2 {
     position: absolute;
     bottom: 10px;
@@ -1083,7 +1089,6 @@ html, body, #map {
     }
 }
 
-
 /*---------------------------------------------------------------------------------------------*/
 #paginationContainer {
     display: flex;
@@ -1117,7 +1122,6 @@ html, body, #map {
     font-weight: bold;
 }
 
-
 /*----------------------------------------------------------------------------------*/
 /* Container card */
 .pope-card {
@@ -1133,7 +1137,6 @@ html, body, #map {
     box-shadow: 0 3px 8px rgba(0, 51, 102, 0.1);
     color: #003366;
 }
-
 
 /* Header section */
 .pope-card-header {
@@ -1208,7 +1211,6 @@ html, body, #map {
     width: 100%;
 }
 
-
 /*----------------------------------------------------------------------*/
 /* MapLibre GL JS Geolocate Control Styling */
 .maplibregl-ctrl-geolocate {
@@ -1251,7 +1253,6 @@ html, body, #map {
 .carousel-button:hover {
     background-color: #ddd;
 }
-
 
 .carousel-button.left {
     left: 0;
