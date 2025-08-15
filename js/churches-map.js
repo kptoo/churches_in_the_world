@@ -24,20 +24,39 @@
                 .then(meta => {
                     metadata = meta;
                     sourceLayerId = metadata.vector_layers ? metadata.vector_layers[0].id : 'parishes';
-                    const mapboxAccessToken = 'pk.eyJ1Ijoia2lwdG9vMDEiLCJhIjoiY202cGlvdnRhMDRxZDJrc2JpbWprN25kaCJ9.YlAHNXzq6IJ8nfoHo0gjTQ';
+                    
                     map = new maplibregl.Map({
                         container: 'map',
-                        style: { // Basic style with OSM raster + our vector source
+                        style: { // Free style with OpenStreetMap raster + our vector source
                             version: 8,
                             sources: {
+                                // Using free OpenStreetMap tiles
                                 osm: {
-                                type: 'raster',
-                                tiles: [
-                                    'https://api.mapbox.com/styles/v1/mapbox/navigation-night-v1/tiles/{z}/{x}/{y}?access_token=' +mapboxAccessToken
-                                ],
-                                tileSize: 256,
-                                attribution: '© Mapbox'
-                            },
+                                    type: 'raster',
+                                    tiles: [
+                                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+                                    ],
+                                    tileSize: 256,
+                                    attribution: '© OpenStreetMap contributors'
+                                },
+                                // Alternative: Dark theme using CartoDB
+                                carto_dark: {
+                                    type: 'raster',
+                                    tiles: [
+                                        'https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png'
+                                    ],
+                                    tileSize: 256,
+                                    attribution: '© CARTO © OpenStreetMap contributors'
+                                },
+                                // Alternative: Stamen Toner (dark style)
+                                stamen_toner: {
+                                    type: 'raster',
+                                    tiles: [
+                                        'https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png'
+                                    ],
+                                    tileSize: 256,
+                                    attribution: 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
+                                },
                                 parishes: {
                                     type: 'vector',
                                     tiles: ['https://churches.onrender.com/tiles/{z}/{x}/{y}'],
@@ -51,7 +70,8 @@
                                 }
                             },
                             layers: [
-                                { id: 'osm-tiles', type: 'raster', source: 'osm' }
+                                // Use CartoDB dark theme by default (similar to Mapbox navigation-night)
+                                { id: 'base-tiles', type: 'raster', source: 'carto_dark' }
                                 // Church layers will be added in onMapLoad
                             ],
                             // Add glyphs URL for text rendering
@@ -70,6 +90,9 @@
                         showUserHeading: true
                     });
                     map.addControl(geolocateControl, 'top-left');
+
+                    // Add style switcher control
+                    addStyleSwitcher();
 
                     // --- Map Event Listeners ---
                     map.on('load', onMapLoad);
@@ -95,6 +118,65 @@
                     console.error('Error loading metadata:', error);
                     // updateLoadingStatus removed
                 });
+        }
+
+        function addStyleSwitcher() {
+            // Create style switcher control
+            class StyleSwitcher {
+                onAdd(map) {
+                    this._map = map;
+                    this._container = document.createElement('div');
+                    this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group';
+                    
+                    const button = document.createElement('button');
+                    button.className = 'style-switcher-btn';
+                    button.innerHTML = '🎨';
+                    button.title = 'Switch Map Style';
+                    button.style.cssText = 'font-size: 16px; width: 30px; height: 30px; border: none; background: white; cursor: pointer;';
+                    
+                    button.addEventListener('click', () => {
+                        this.switchStyle();
+                    });
+                    
+                    this._container.appendChild(button);
+                    return this._container;
+                }
+
+                onRemove() {
+                    this._container.parentNode.removeChild(this._container);
+                    this._map = undefined;
+                }
+
+                switchStyle() {
+                    const currentStyle = this._map.getStyle();
+                    const currentSource = currentStyle.layers[0].source;
+                    
+                    let newSource;
+                    switch(currentSource) {
+                        case 'carto_dark':
+                            newSource = 'osm';
+                            break;
+                        case 'osm':
+                            newSource = 'stamen_toner';
+                            break;
+                        case 'stamen_toner':
+                            newSource = 'carto_dark';
+                            break;
+                        default:
+                            newSource = 'carto_dark';
+                    }
+                    
+                    this._map.setLayoutProperty('base-tiles', 'visibility', 'none');
+                    this._map.removeLayer('base-tiles');
+                    this._map.addLayer({
+                        id: 'base-tiles',
+                        type: 'raster',
+                        source: newSource
+                    }, churchLayerId); // Add before church layers
+                }
+            }
+
+            map.addControl(new StyleSwitcher(), 'top-left');
         }
 
         function onMapLoad() {
