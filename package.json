@@ -1,7 +1,19 @@
 {
+  "name": "churches-map-server",
+  "version": "1.0.0",
+  "description": "Church map server with MBTiles",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
   "dependencies": {
+    "express": "^4.18.2",
     "@mapbox/mbtiles": "^0.12.1",
     "@mapbox/vector-tile": "^2.0.3",
     "pbf": "^4.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }
